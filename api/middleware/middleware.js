@@ -1,11 +1,26 @@
 const User = require("../users/users-model");
 
 function logger(req, res, next) {
-  // DO YOUR MAGIC
+  console.log(
+    `${new Date().toISOString()} ${req.method} to ${req.url} from ${req.get(
+      "host"
+    )}`
+  );
+  next();
 }
 
-function validateUserId(req, res, next) {
-  // DO YOUR MAGIC
+async function validateUserId(req, res, next) {
+  try {
+    const validUserId = await User.getById(req.params.id);
+    if (validUserId) {
+      req.user = validUserId;
+      next();
+    } else {
+      next({ status: 404, message: "user not found" });
+    }
+  } catch (error) {
+    next(error);
+  }
 }
 
 function validateUser(req, res, next) {
@@ -17,4 +32,7 @@ function validatePost(req, res, next) {
 }
 
 // do not forget to expose these functions to other modules
-module.exports = {};
+module.exports = {
+  logger,
+  validateUserId,
+};
