@@ -17,7 +17,7 @@ async function validateUserId(req, res, next) {
         message: "user not found",
       });
     } else {
-      req.user = validUserId;
+      req.body = validUserId;
       next();
     }
   } catch (error) {
@@ -28,12 +28,18 @@ async function validateUserId(req, res, next) {
 }
 
 function validateUser(req, res, next) {
-  // DO YOUR MAGIC
+  const { name } = req.body;
+  if (!name || !name.trim()) {
+    res.status(400).json({
+      message: "missing required name field",
+    });
+  } else {
+    req.name = name.trim();
+    next();
+  }
 }
 
-function validatePost(req, res, next) {
-  // DO YOUR MAGIC
-}
+function validatePost(req, res, next) {}
 
 // do not forget to expose these functions to other modules
 module.exports = {
