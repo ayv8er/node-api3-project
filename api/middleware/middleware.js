@@ -2,7 +2,7 @@ const User = require("../users/users-model");
 
 function logger(req, res, next) {
   console.log(
-    `${new Date().toISOString()} ${req.method} to ${req.url} from ${req.get(
+    `${new Date().toLocaleString()} ${req.method} to ${req.url} from ${req.get(
       "host"
     )}`
   );
@@ -12,14 +12,18 @@ function logger(req, res, next) {
 async function validateUserId(req, res, next) {
   try {
     const validUserId = await User.getById(req.params.id);
-    if (validUserId) {
+    if (!validUserId) {
+      res.status(404).json({
+        message: "user not found",
+      });
+    } else {
       req.user = validUserId;
       next();
-    } else {
-      next({ status: 404, message: "user not found" });
     }
   } catch (error) {
-    next(error);
+    res.status(500).json({
+      message: "problem finding user",
+    });
   }
 }
 
@@ -35,4 +39,6 @@ function validatePost(req, res, next) {
 module.exports = {
   logger,
   validateUserId,
+  validateUser,
+  validatePost,
 };
